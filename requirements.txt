@@ -1,0 +1,11 @@
+tweepy
+pyyaml
+pandas
+matplotlib
+seaborn
+notebook
+scikit-learn
+scikit-image
+imageio
+scipy
+tqdm
