@@ -4,6 +4,7 @@ pandas
 matplotlib
 seaborn
 notebook
+ipywidgets
 scikit-learn
 scikit-image
 imageio
