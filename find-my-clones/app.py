@@ -79,7 +79,7 @@ def query_clones():
         )
     except:
         traceback.print_exc()
-        myresults['error']='invalid handle'
+        myresults['error']=f'invalid handle \n{traceback.format_exc()}'
         return jsonify(myresults)
     
     if reference_image is None:
