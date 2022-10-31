@@ -1,0 +1,5 @@
+tweepy==4.12.0
+pyyaml==6.0
+pandas==1.5.1
+imageio==2.22.2
+flask==2.2.2

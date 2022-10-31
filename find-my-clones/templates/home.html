@@ -1,0 +1,48 @@
+<html>
+<head>
+    <!-- me hate frontend and guis -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h3>welcome to `find-my-clones` page!</h3>
+
+    <h4>enter your twitter handle below:</h4>    
+    <label for="screen_name">twitter handle: @</label>
+    <input type="text">
+    <button type="submit" value="Submit" onclick=submitData()>Submit</button>
+    <br>+ if your handle is "@elonmusk", then enter "elonmusk", then click Submit.
+    <br>+ query time should take no longer than 5 seconds.
+    <hr>
+    <p>results:</p>
+    <div id="queryResults"></div>
+    <script>
+    fillwithtext('queryResults',"na");
+    function submitData(){
+        const form = document.querySelector("form")
+        const input = document.querySelector("input")
+        console.log('querying...')
+        axios.get('http://192.168.68.138:5000/v1/query_clones', {
+            params: { screen_name: input.value}
+        })
+        .then(function (response) {
+          //handle success
+          console.log('success!');
+          console.log(response.status);
+          console.log(response.data);
+          var myLength = Object.keys(response.data).length;
+          currentdate = new Date();
+          fillwithtext('queryResults',"<pre>"+JSON.stringify(response.data,null, 2)+"</pre>");
+        })
+        .catch(function (response) {
+          //handle error
+          console.log('error!');
+          console.log(response.status);
+          fillwithtext('queryResults','unexpected error occured!');
+        });
+    }
+    function fillwithtext(elementID,text) {
+        document.getElementById(elementID).innerHTML = text;
+    }
+    </script>
+</body>
+</html>
