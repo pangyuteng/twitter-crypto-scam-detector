@@ -14,7 +14,7 @@
 </head>
 <body>
     <h3>welcome to `find-my-clones` page!</h3>
-    this application allows you to query accounts containing your twitter name, and returns accounts with similar profile pic.    
+    this application allows you to query accounts containing your twitter name, and returns accounts with similar profile pic (corr coef > 0.6).
     <h4>enter your twitter handle below:</h4>    
     <label for="screen_name">twitter handle: @</label>
     <input type="text">
@@ -22,7 +22,7 @@
     <br>+ if your handle is "@elonmusk", then enter "elonmusk", and click "Submit".
     <br>+ query time should take no longer than 5 seconds.
     <hr>
-    <p>results:</p>
+    <p>raw results:</p>
     <div id="queryResults"></div>
     <hr>
     <br>contact:<a href="https://twitter.com/aigonewrong">@aigonewrong</a>

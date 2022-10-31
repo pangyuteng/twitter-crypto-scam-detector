@@ -63,6 +63,7 @@ def ping():
 @app.route('/find-my-clones', methods=['GET'])
 def find_my_clones():
     return render_template('home.html',root_url="https://www.aigonewrong.com")
+    #return render_template('home.html',root_url="http://localhost:8080")
 
 @app.route('/find-my-clones/v1/query_clones', methods=['GET'])
 def query_clones():
@@ -71,7 +72,7 @@ def query_clones():
         reference_screen_name = request.args.get('screen_name')
         user,reference_image = get_user_info(reference_screen_name)
         user_name = user.name
-        query_list = [reference_screen_name,user_name,description]
+        query_list = [reference_screen_name,user_name]
         query_list.extend(user.description.split('\n'))
         myresults = dict(
             tstamp=datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'),
@@ -79,11 +80,13 @@ def query_clones():
         )
     except:
         traceback.print_exc()
-        myresults['error']=f'invalid handle \n{traceback.format_exc()}'
+        myresults['error']=f'invalid handle! \n{traceback.format_exc()}'
+        myresults['result_count']=0
         return jsonify(myresults)
     
     if reference_image is None:
         myresults['error']='handle have no profile pic'
+        myresults['result_count']=0
         return jsonify(myresults)
     # find  page_count*items_per_page count that matches the query
     # API limit is 1k.
@@ -110,9 +113,9 @@ def query_clones():
     mylist = []
     profile_cache = {}
     user_cache = {}
-    for n,x in enumerate(fetch):
+    for n,item in enumerate(fetch):
         try:
-            user,profile_image = get_user_info(x.screen_name)
+            user,profile_image = get_user_info(item.screen_name)
             # skip item if its reference
             if user.screen_name == reference_screen_name:
                 continue
@@ -122,13 +125,17 @@ def query_clones():
                 continue
             # compute only if shape matches
             if profile_image.shape == reference_image.shape:
-                item = dict(screen_name=user.screen_name,mean_pixel_diff=np.mean(profile_image-reference_image))
+                x = profile_image.ravel()
+                y = reference_image.ravel()
+                c=np.corrcoef(x,y)
+                sim_val = c[0,1]
+                item = dict(screen_name=user.screen_name,sim_val=sim_val)
                 profile_cache[user.screen_name]=profile_image.copy()
-                user_cache[user.screen_name]=x
+                user_cache[user.screen_name]=user
             else:
-                item = dict(screen_name=user.screen_name,mean_pixel_diff=np.nan)
+                item = dict(screen_name=user.screen_name,sim_val=np.nan)
                 profile_cache[user.screen_name]=None
-                user_cache[user.screen_name]=x
+                user_cache[user.screen_name]=user
             mylist.append(item)
         except:
             traceback.print_exc()
@@ -140,11 +147,11 @@ def query_clones():
         return jsonify(myresults)
 
     df = pd.DataFrame(mylist)
-    df = df.sort_values('mean_pixel_diff')
+    df = df.sort_values('sim_val')
     print(len(df))
 
-    TH = 100 # empirically set threshold
-    df = df[df.mean_pixel_diff<=TH]
+    TH = 0.6
+    df = df[df.sim_val>=TH]
 
     print(df.shape)
 
@@ -154,12 +161,12 @@ def query_clones():
         screen_name = user.screen_name
         name = user.name
         url = f'https://twitter.com/{screen_name}'
-        mean_pixel_diff = row.mean_pixel_diff
+        sim_val = row.sim_val
 
         item = dict(
             name=user.name,
             screen_name=screen_name,
-            mean_pixel_diff=float(np.round(mean_pixel_diff,2)),
+            sim_val=float(np.round(sim_val,2)),
             url=url,
         )
         matched_list.append(item)
