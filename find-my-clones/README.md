@@ -26,14 +26,10 @@ zappa init
 zappa deploy prod
 zappa update prod
 
--- update `root_url` in app.py
-
-https://pi2twse975.execute-api.us-east-1.amazonaws.com/dev/home
 
 zappa undeploy dev --remove-logs
 
-
-# TODO: deploy via aws?
+--
 
 https://aws.amazon.com/getting-started/hands-on/build-serverless-web-app-lambda-apigateway-s3-dynamodb-cognito/
 
