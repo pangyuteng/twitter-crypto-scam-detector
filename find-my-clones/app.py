@@ -147,7 +147,7 @@ def query_clones():
         return jsonify(myresults)
 
     df = pd.DataFrame(mylist)
-    df = df.sort_values('sim_val')
+    df = df.sort_values('sim_val',ascending=False)
     print(len(df))
 
     TH = 0.6
