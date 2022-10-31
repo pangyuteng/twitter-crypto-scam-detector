@@ -70,7 +70,9 @@ def query_clones():
     try:
         reference_screen_name = request.args.get('screen_name')
         user,reference_image = get_user_info(reference_screen_name)
-        query = user.name
+        user_name = user.name
+        query_list = [reference_screen_name,user_name,description]
+        query_list.extend(user.description.split('\n'))
         myresults = dict(
             tstamp=datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'),
             handle=reference_screen_name,
@@ -90,12 +92,13 @@ def query_clones():
     count_per_page = 100
 
     try:
-        for x in range(page_num):
-            print(f'querying page {x}')
-            tmp = api.search_users(query,count=count_per_page,page=x)
-            fetch.extend(tmp)
-            if len(tmp)<count_per_page:
-                break
+        for query in query_list:
+            for x in range(page_num):
+                print(f'querying page {x}')
+                tmp = api.search_users(query,count=count_per_page,page=x)
+                fetch.extend(tmp)
+                if len(tmp)<count_per_page:
+                    break
     except:
         traceback.print_exc()
         myresults['error']='error occurred during querying.'
