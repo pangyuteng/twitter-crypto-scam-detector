@@ -3,3 +3,4 @@ pyyaml==6.0
 pandas==1.5.1
 imageio==2.22.2
 flask==2.2.2
+zappa==0.55.0

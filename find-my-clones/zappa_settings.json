@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "app_function": "app.app",
+        "aws_region": "us-east-1",
+        "profile_name": "default",
+        "project_name": "find-my-clones",
+        "runtime": "python3.8",
+        "s3_bucket": "zappa-ita6887za"
+    }
+}

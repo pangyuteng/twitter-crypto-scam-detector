@@ -56,13 +56,13 @@ app = Flask(__name__,
     template_folder='templates',
 )
 
-@app.route('/ping', methods=['GET'])
-def ping():
-    return jsonify({"message":"pong"})
+@app.route("/")
+def serve():
+    return jsonify(success=True)
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home.html')
+    return render_template('home.html',root_url="https://pi2twse975.execute-api.us-east-1.amazonaws.com/dev")
 
 @app.route('/v1/query_clones', methods=['GET'])
 def query_clones():
@@ -169,7 +169,7 @@ def query_clones():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p","--port",type=int,default=5000)
+    parser.add_argument("-p","--port",type=int,default=8080)
     args = parser.parse_args()
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True,host="0.0.0.0",port=args.port)
