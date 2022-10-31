@@ -22,7 +22,7 @@
         const form = document.querySelector("form")
         const input = document.querySelector("input")
         console.log('querying...')
-        axios.get('{{root_url}}/v1/query_clones', {
+        axios.get('{{root_url}}/find-my-clones/v1/query_clones', {
             params: { screen_name: input.value}
         })
         .then(function (response) {

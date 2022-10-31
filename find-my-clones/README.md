@@ -19,11 +19,19 @@ source myvenv/bin/activate
 pip install zappa
 pip install -r requirements.txt
 
+stage: prod
+s3: zappa-find-my-clones
 
+zappa init
+zappa deploy prod
+zappa update prod
 
+-- update `root_url` in app.py
 
+https://pi2twse975.execute-api.us-east-1.amazonaws.com/dev/home
 
-curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path": "/", "httpMethod": "GET", "requestContext": {}, "body": null}'
+zappa undeploy dev --remove-logs
+
 
 # TODO: deploy via aws?
 

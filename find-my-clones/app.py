@@ -56,15 +56,15 @@ app = Flask(__name__,
     template_folder='templates',
 )
 
-@app.route("/")
-def serve():
+@app.route("/ping")
+def ping():
     return jsonify(success=True)
 
-@app.route('/home', methods=['GET'])
-def home():
-    return render_template('home.html',root_url="https://pi2twse975.execute-api.us-east-1.amazonaws.com/dev")
+@app.route('/find-my-clones', methods=['GET'])
+def find_my_clones():
+    return render_template('home.html',root_url="https://www.aigonewrong.com")
 
-@app.route('/v1/query_clones', methods=['GET'])
+@app.route('/find-my-clones/v1/query_clones', methods=['GET'])
 def query_clones():
     myresults = {}
     try:
@@ -130,7 +130,6 @@ def query_clones():
         except:
             traceback.print_exc()
             continue
-    
 
     if len(mylist)==0:
         myresults['result_count']=0
@@ -176,6 +175,6 @@ if __name__ == '__main__':
 
 
 """
-curl -X GET localhost:5000/v1/query_clones?screen_name=VailshireCap
+curl -X GET localhost:8080/v1/query_clones?screen_name=VailshireCap
 
 """
