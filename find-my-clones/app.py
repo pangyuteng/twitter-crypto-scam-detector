@@ -164,7 +164,7 @@ def _query_clones(reference_screen_name):
         stripped_name = specialstrip(user.name)
         profile_url = f'https://twitter.com/{screen_name}'
         sim_val = row.sim_val
-        #asdf
+
         item = dict(            
             handle=screen_name,
             profile_url=profile_url,
@@ -172,6 +172,13 @@ def _query_clones(reference_screen_name):
             corr_coef=float(np.round(sim_val,2)),
             name=stripped_name,
         )
+
+        # remove reference, and duplicates.
+        if screen_name == reference_screen_name:
+            continue
+        if item in matched_list:
+            continue
+
         print(user.name)
         print(len(user.name),'!!')
         matched_list.append(item)
