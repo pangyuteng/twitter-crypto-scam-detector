@@ -14,7 +14,8 @@
 </head>
 <body>
     <h3>welcome to `find-my-clones` page!</h3>
-    this application allows you to query accounts containing your twitter name, and returns accounts with similar profile pic*.
+    This application allows you to query twitter accounts containing your name, profile content, and returns accounts with similar profile pics*.<br>
+    
     <h4>enter your twitter handle below:</h4>
     <form method="get" action="find-my-clones">
         <p>twitter handle: @<input type="text" id="datepicker"  name='screen_name'></p>
@@ -48,17 +49,18 @@
         <br><br>
         <table>     
         <tr>
-            <th>screen_name</th>
+            <th>handle</th>
             <th>corr_coef</th>
-            <th>pic & name</th>
+            <th>pic</th>
+            <th>name</th>
             <th>url</th>
         </tr>
             {% for item in result_dict.results %}
         <tr>
-            <td>@{{item.screen_name}}</td>
+            <td>@{{item.handle}}</td>
             <td>{{item.corr_coef}}</td>
-            <td><img src="{{item.profile_image_url}}"> {{item.name}}</td>                        
-            
+            <td><img src="{{item.profile_image_url}}"></td>
+            <td>{{item.name}}</td> 
             <td><a href="{{item.profile_url}}">{{item.profile_url}}</a></td>
         </tr>
             {% endfor %}
@@ -69,6 +71,7 @@
             {% for item in result_dict.results %}
             <a href="{{item.profile_url}}">{{item.profile_url}}</a><br>
             {% endfor %}
+
         {% endif %}
         {% endif %}
         

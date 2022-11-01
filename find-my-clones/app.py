@@ -1,6 +1,7 @@
 import argparse
 import traceback
 import yaml
+import re
 import tweepy
 import numpy as np
 import pandas as pd
@@ -59,6 +60,12 @@ app = Flask(__name__,
 @app.route("/ping")
 def ping():
     return jsonify(success=True)
+
+#https://stackoverflow.com/questions/1276764/stripping-everything-but-alphanumeric-chars-from-a-string-in-python
+# some names have odd chars, strip it down to friendly chars.
+from string import ascii_letters, digits
+def specialstrip(InputString):
+    return "".join([ch for ch in InputString if ch in (ascii_letters + digits)])
 
 def _query_clones(reference_screen_name):
 
@@ -154,17 +161,19 @@ def _query_clones(reference_screen_name):
     for n,row in df.iterrows():
         user = user_cache[row.screen_name]
         screen_name = user.screen_name
-        name = user.name
+        stripped_name = specialstrip(user.name)
         profile_url = f'https://twitter.com/{screen_name}'
         sim_val = row.sim_val
-
-        item = dict(
-            name=user.name,
-            screen_name=screen_name,
+        #asdf
+        item = dict(            
+            handle=screen_name,
+            profile_url=profile_url,
             profile_image_url=user.profile_image_url,
             corr_coef=float(np.round(sim_val,2)),
-            profile_url=profile_url,
+            name=stripped_name,
         )
+        print(user.name)
+        print(len(user.name),'!!')
         matched_list.append(item)
 
     myresults['result_count']=len(matched_list)
