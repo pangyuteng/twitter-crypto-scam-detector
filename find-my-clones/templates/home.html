@@ -15,16 +15,65 @@
 <body>
     <h3>welcome to `find-my-clones` page!</h3>
     this application allows you to query accounts containing your twitter name, and returns accounts with similar profile pic*.
-    <h4>enter your twitter handle below:</h4>    
-    <label for="screen_name">twitter handle: @</label>
-    <input type="text">
-    <button type="submit" value="Submit" onclick=submitData()>Submit</button>
+    <h4>enter your twitter handle below:</h4>
+    <form method="get" action="find-my-clones">
+        <p>twitter handle: @<input type="text" id="datepicker"  name='screen_name'></p>
+        <input type="submit">
+    </form>
     <br>+ if your handle is "@elonmusk", then enter "elonmusk", and click "Submit".
     <br>+ query time should take no longer than 30 seconds.
-    <br>* <a href="https://en.wikipedia.org/wiki/Correlation">correlation coefficient</a> between two vectorized images is computed (`sim_val`) and those where "sim_val > 0.6" are returned as "likely clones".</a>
+    <br>* <a href="https://en.wikipedia.org/wiki/Correlation">correlation coefficient</a> between two vectorized images is computed, those where corr_coef > 0.6 are deemed similar and returned as results.</a>
     <hr>
-    <p>raw results:</p>
-    <div id="queryResults"></div>
+    <h4>results:</h4>
+    {% if result_dict | length == 0 %} 
+    na
+    {% else %}
+
+        {% if result_dict.error is defined %}
+        error: {{result_dict.error}}<br>
+        {% endif %}
+
+        {% if result_dict.tstamp is defined %}
+        tstamp: {{result_dict.tstamp}}<br>
+        {% endif %}
+
+        {% if result_dict.handle is defined %}
+        handle: {{result_dict.handle}}<br>
+        {% endif %}
+        
+        {% if result_dict.result_count is defined %}
+        result_count: {{result_dict.result_count}}<br>
+
+        {% if result_dict.result_count > 0 %}
+        <br><br>
+        <table>     
+        <tr>
+            <th>screen_name</th>
+            <th>corr_coef</th>
+            <th>pic & name</th>
+            <th>url</th>
+        </tr>
+            {% for item in result_dict.results %}
+        <tr>
+            <td>@{{item.screen_name}}</td>
+            <td>{{item.corr_coef}}</td>
+            <td><img src="{{item.profile_image_url}}"> {{item.name}}</td>                        
+            
+            <td><a href="{{item.profile_url}}">{{item.profile_url}}</a></td>
+        </tr>
+            {% endfor %}
+        </table>
+        <br><br>
+        <hr>
+        for copy and pasting:<br>
+            {% for item in result_dict.results %}
+            <a href="{{item.profile_url}}">{{item.profile_url}}</a><br>
+            {% endfor %}
+        {% endif %}
+        {% endif %}
+        
+
+    {% endif %}
     <hr>
     <a href="https://twitter.com/aigonewrong">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
@@ -33,34 +82,5 @@
     <a href="https://tippin.me/@aigonewrong">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 24l3-9h-9l14-15-3 9h9l-14 15z"/></svg></a>
     <br>
-    <script>
-    fillwithtext('queryResults',"na");
-    function submitData(){
-        const form = document.querySelector("form")
-        const input = document.querySelector("input")
-        console.log('querying...')
-        axios.get('{{root_url}}/find-my-clones/v1/query_clones', {
-            params: { screen_name: input.value}
-        })
-        .then(function (response) {
-          //handle success
-          console.log('success!');
-          console.log(response.status);
-          console.log(response.data);
-          var myLength = Object.keys(response.data).length;
-          currentdate = new Date();
-          fillwithtext('queryResults',"<pre>"+JSON.stringify(response.data,null, 2)+"</pre>");
-        })
-        .catch(function (response) {
-          //handle error
-          console.log('error!');
-          console.log(response.status);
-          fillwithtext('queryResults','unexpected error occured!');
-        });
-    }
-    function fillwithtext(elementID,text) {
-        document.getElementById(elementID).innerHTML = text;
-    }
-    </script>
 </body>
 </html>

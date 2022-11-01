@@ -60,34 +60,28 @@ app = Flask(__name__,
 def ping():
     return jsonify(success=True)
 
-@app.route('/find-my-clones', methods=['GET'])
-def find_my_clones():
-    return render_template('home.html',root_url="https://www.aigonewrong.com")
-    #return render_template('home.html',root_url="http://localhost:8080")
+def _query_clones(reference_screen_name):
 
-@app.route('/find-my-clones/v1/query_clones', methods=['GET'])
-def query_clones():
-    myresults = {}
+    myresults = dict(
+        handle=reference_screen_name,
+        tstamp=datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'),
+    )
+
     try:
-        reference_screen_name = request.args.get('screen_name')
         user,reference_image = get_user_info(reference_screen_name)
         user_name = user.name
         query_list = [reference_screen_name,user_name]
         query_list.extend(user.description.split('\n'))
-        myresults = dict(
-            tstamp=datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'),
-            handle=reference_screen_name,
-        )
     except:
         traceback.print_exc()
         myresults['error']=f'invalid handle! \n{traceback.format_exc()}'
         myresults['result_count']=0
-        return jsonify(myresults)
+        return myresults
     
     if reference_image is None:
         myresults['error']='handle have no profile pic'
         myresults['result_count']=0
-        return jsonify(myresults)
+        return myresults
     # find  page_count*items_per_page count that matches the query
     # API limit is 1k.
     fetch = []
@@ -104,8 +98,9 @@ def query_clones():
                     break
     except:
         traceback.print_exc()
-        myresults['error']='error occurred during querying.'
-        return jsonify(myresults)
+        myresults['error']=f'error occurred during querying. {traceback.format_exc()}'
+        myresults['result_count']=0
+        return myresults
         
     print(len(fetch))
     
@@ -144,7 +139,7 @@ def query_clones():
     if len(mylist)==0:
         myresults['result_count']=0
         myresults['results']=[]
-        return jsonify(myresults)
+        return myresults
 
     df = pd.DataFrame(mylist)
     df = df.sort_values('sim_val',ascending=False)
@@ -160,21 +155,40 @@ def query_clones():
         user = user_cache[row.screen_name]
         screen_name = user.screen_name
         name = user.name
-        url = f'https://twitter.com/{screen_name}'
+        profile_url = f'https://twitter.com/{screen_name}'
         sim_val = row.sim_val
 
         item = dict(
             name=user.name,
             screen_name=screen_name,
-            sim_val=float(np.round(sim_val,2)),
-            url=url,
+            profile_image_url=user.profile_image_url,
+            corr_coef=float(np.round(sim_val,2)),
+            profile_url=profile_url,
         )
         matched_list.append(item)
 
     myresults['result_count']=len(matched_list)
     myresults['results']=matched_list
+    return myresults
 
-    return jsonify(myresults)
+@app.route('/find-my-clones', methods=['GET'])
+def find_my_clones():
+    reference_screen_name = request.args.get('screen_name',None)
+    if reference_screen_name is not None:
+        result_dict = _query_clones(reference_screen_name)
+    else:
+        result_dict = {}
+    print(result_dict)
+    return render_template('home.html',
+        result_dict=result_dict,
+    )
+
+# @app.route('/find-my-clones/v1/query_clones', methods=['GET'])
+# def query_clones():
+#     reference_screen_name = request.args.get('screen_name')    
+#     myresults = _query_clones(reference_screen_name)
+#     return jsonify(myresults)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
