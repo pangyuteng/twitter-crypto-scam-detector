@@ -13,8 +13,8 @@ docker run -it -p 9000:8080 \
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt-get update
 sudo apt-get install python3.8-dev python3.8-venv -yq
-python3.8 -m venv myvenv
-source myvenv/bin/activate
+python3.8 -m venv ~/virtual_env/find-my-clones
+source ~/virtual_env/find-my-clones/bin/activate
 
 echo $(openssl rand -hex 4)
 append above to s3_bucket in `zappa_settings.json`
