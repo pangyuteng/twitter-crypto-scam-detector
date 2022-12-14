@@ -16,6 +16,9 @@ sudo apt-get install python3.8-dev python3.8-venv -yq
 python3.8 -m venv myvenv
 source myvenv/bin/activate
 
+echo $(openssl rand -hex 4)
+append above to s3_bucket in `zappa_settings.json`
+
 pip install zappa
 pip install -r requirements.txt
 
